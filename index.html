@@ -4,8 +4,36 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>twitter-clone</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  
+  <div class="header">
+    <h1>Twitter Clone</h1>
+    <input type="text" id="search" placeholder="Search">
+    <select id="users"></select>
+</div>
+<div class="container">
+    <div class="profile">
+        <img id="profileImg" src="https://sb.kaleidousercontent.com/67418/1672x1018/6463a5af0d/screenshot-2022-05-24-at-15-22-28.png" alt="Profile Image">
+        <div>
+            <h2 id="profileName"></h2>
+            <p id="profileUsername"></p>
+            <p id="profileWebsite"></p>
+            <p id="profileCompany"></p>
+            <p id="profileLocation"></p>
+        </div>
+    </div>
+
+    <div id="posts">
+        <h2>Posts</h2>
+        <div id="postList"></div>
+    </div>
+
+    <div id="comments">
+        <h2>Comments</h2>
+        <div id="commentList"></div>
+    </div>
+</div>
+<script src="main.js"></script>
 </body>
 </html>

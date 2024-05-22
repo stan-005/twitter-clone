@@ -24,23 +24,30 @@ document.addEventListener('DOMContentLoaded', () => {
   
         // Set default user and fetch posts
         usersSelect.value = 1;
-        fetchUserProfile(1);
+        fetchUserProfile(1).then(user => renderUserProfile(user));
         fetchPosts(1);
       });
-  
-    // Fetch User Profile
-    function fetchUserProfile(userId) {
-      fetch(`https://jsonplaceholder.typicode.com/users/${userId}`)
-        .then(response => response.json())
-        .then(user => {
-          profileImg.src = `https://randomuser.me/api/portraits/men/${userId}.jpg`;
-          profileBanner.src = './images/background.jpg'; // Add your banner image URL
-          profileName.textContent = user.name;
-          profileUsername.textContent = `@${user.username}`;
-          profileWebsite.textContent = user.website;
-          profileCompany.textContent = user.company.name;
-          profileLocation.textContent = user.address.city;
-        });
+
+    
+    async function fetchUserProfile(userId) {
+      try {
+        const response = await fetch(`https://jsonplaceholder.typicode.com/users/${userId}`);
+        const user = await response.json();
+        return user;
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
+
+    function renderUserProfile(user) {
+      profileImg.src = `https://randomuser.me/api/portraits/men/${user.id}.jpg`;
+      profileBanner.src = './images/background.jpg';//banner
+      profileName.textContent = user.name;
+      profileUsername.textContent = `@${user.username}`;
+      profileWebsite.textContent = user.website;
+      profileCompany.textContent = user.company.name;
+      profileLocation.textContent = user.address.city;
     }
   
     // Fetch Posts for Selected User
@@ -50,24 +57,25 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(posts => {
           postList.innerHTML = '';
           posts.forEach(post => {
-            const postDiv = document.createElement('div');
-            
-            postDiv.className = 'post';
-            postDiv.innerHTML = `
-              <img src="${profileImg.src}" alt="Profile Image">
-              <div class="content">
-              <p class="paraIcons"><span>John Doe</span><ion-icon class="paraIcon1" name="checkmark-outline"></ion-icon><ion-icon class="paraIcon2" name="logo-twitter"></ion-icon></p>
-                <p>${post.body}</p>
-                <div class="actions">
-                  <span><ion-icon name="chatbubble-ellipses-outline"></ion-icon> 200</span>
-                  <span><ion-icon name="git-compare-outline"></ion-icon> 200</span>
-                  <span><ion-icon class="heart" name="heart"></ion-icon> 200</span>
+            fetchUserProfile(userId).then(user => {
+              const postDiv = document.createElement('div');
+              postDiv.className = 'post';
+              postDiv.innerHTML = `
+                <img src="${profileImg.src}" alt="Profile Image">
+                <div class="content">
+                <p class="paraIcons"><span>${user.name} @${user.username}</span><ion-icon class="paraIcon1" name="checkmark-outline"></ion-icon><ion-icon class="paraIcon2" name="logo-twitter"></ion-icon></p>
+                  <p>${post.body}</p>
+                  <div class="actions">
+                    <span><ion-icon name="chatbubble-ellipses-outline"></ion-icon> 200</span>
+                    <span><ion-icon name="git-compare-outline"></ion-icon> 200</span>
+                    <span><ion-icon class="heart" name="heart"></ion-icon> 200</span>
+                  </div>
                 </div>
-              </div>
-            `;
-            postDiv.dataset.postId = post.id;
-            postDiv.addEventListener('click', () => fetchComments(post.id));
-            postList.appendChild(postDiv);
+              `;
+              postDiv.dataset.postId = post.id;
+              postDiv.addEventListener('click', () => fetchComments(post.id));
+              postList.appendChild(postDiv);
+            });
           });
   
           // Set default post comments
@@ -106,20 +114,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Event Listener for User Selection
     usersSelect.addEventListener('change', () => {
       const userId = usersSelect.value;
-      fetchUserProfile(userId);
-      fetchPosts(userId);
-    });
-  
-    // Event Listener for Search
-    searchInput.addEventListener('input', () => {
-      const query = searchInput.value.toLowerCase();
-      const options = Array.from(usersSelect.options);
-      const matchingOption = options.find(option => option.textContent.toLowerCase().includes(query));
-      if (matchingOption) {
-        usersSelect.value = matchingOption.value;
-        fetchUserProfile(matchingOption.value);
-        fetchPosts(matchingOption.value);
-      }
+      // const user = fetchUserProfile(userId);
+      // console.log(user);
+      fetchUserProfile(userId).then(user => {
+        renderUserProfile(user);
+        fetchPosts(userId);
+      });
     });
   });
-  
